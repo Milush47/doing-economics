@@ -1,13 +1,12 @@
 #installing library
 install.packages("mosaic", lib = "/Library/Frameworks/R.framework/Versions/4.3-arm64/Resources/library")
 
-#load the library
-library(mosaic)
+
 
 tempdata <- read.csv("Data/NH.Ts+dSST.csv", skip = 1, na.strings = "***")
 
 # head(tempdata)
-str(tempdata)
+#str(tempdata)
 
 tempdata$Jan <- ts(tempdata$Jan, start = c(1880), end = c(2023), frequency = 1)
 tempdata$DJF <- ts(tempdata$DJF, start = c(1880), end = c(2023), frequency = 1)
@@ -55,35 +54,4 @@ plot(tempdata$J.D, type = "l", col = "blue", lwd = 2,
 title("Average temperature anomaly in the northern hemisphere (1880-2023)")
 abline(h = 0, col = "darkorange2", lwd = 2)
 
-#---------------------------------------------------------------------------
 
-#FREQUENCY TABLES
-#categorical variable that indicates subperiods
-tempdata$Period <- factor(NA,
-levels = c("1921-1950", "1951-1980", "1981-2010"),
-ordered = TRUE)
-
-tempdata$Period[(tempdata$Year > 1920) & (tempdata$Year < 1951)] <- "1921-1950"
-tempdata$Period[(tempdata$Year > 1950) & (tempdata$Year < 1981)] <- "1951-1980"
-tempdata$Period[(tempdata$Year > 1980) & (tempdata$Year < 2011)] <- "1981-2010"
-
-temp_summer <- c(tempdata$Jun, tempdata$Jul, tempdata$Aug)
-
-#combine the temperature data for June, July and August
-temp_summer <- unlist(tempdata[, 7:9], use.names = FALSE)
-
-#mirror the period information for temp_sum
-temp_period <- c(tempdata$Period, tempdata$Period, tempdata$Period)
-
-#repopulate the factor information
-temp_period <- factor(temp_period, levels = 1:nlevels(tempdata$Period),
-labels = levels(tempdata$Period))
-
-hist(temp_summer[(temp_period == "1951-1980")], plot = FALSE)
-
-
-histogram(~ temp_summer | temp_period, type = "count",
-breaks = seq(-0.5, 1.3, 0.10),
-main = "Histogram of Temperature anomalies",
-xlab = "Summer temperature distribution"
-)
